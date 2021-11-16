@@ -141,16 +141,197 @@ SELECT SUM(Book_price) AS Total FROM Book_Details;
 
 SELECT COUNT(*) AS Total_count FROM Book_Details;
 
+select count(*) as ID from Book_Details;
+
+select time('2021-11-13 09:30:56') as Extracted_Year;
+
+select  week('2021-11-13 09:30:56') as Extracted_Week;
+
 SELECT Book_Author, COUNT(Book_Name) AS Count_Book_Author FROM Book_details GROUP BY Book_Author;
 
 SELECT Book_Name, COUNT(Book_Price) AS Count_Book_Price FROM Book_Details GROUP BY Book_Price;
 
 SELECT Publish_Year, COUNT(Book_Name) AS count_book_name, Book_Name FROM Book_Details WHERE Publish_Year > 2005 GROUP BY Publish_Year;
 
+SET AUTOCOMMIT = 0;
+SELECT * 
+FROM book_details;
 
+DELETE FROM book_details
+WHERE Book_id = 7;
 
+ROLLBACK;
 
+SELECT MAX(Book_Price) 
+FROM book_details;
 
+-- GET THE DETAILS OF THE BOOK WHICH HIGHEST COST
+
+-- main query or outer query
+SELECT *
+FROM book_details	-- inner query
+WHERE Book_Price = (SELECT MAX(Book_Price) FROM book_details);
+
+-- Get the second highest cost of the book from the book_details table
+
+SELECT MAX(Book_Price) AS Second_Highest_Cost_of_The_Book
+FROM book_details
+WHERE Book_Price < (SELECT MAX(Book_Price) FROM book_details);
+
+-- GET THE DETAILS OF THE BOOK WHICH SECOND HIGHEST COST
+
+SELECT *
+FROM book_details
+WHERE Book_Price =
+ (SELECT MAX(Book_Price) AS Second_Highest_Cost_of_The_Book
+ FROM book_details
+ WHERE Book_Price < 
+ (SELECT MAX(Book_Price)
+ FROM book_details));
+ 
+ -- to get the third hishest cost of the book_price from book_details table
+ 
+ SELECT MAX(Book_price) AS Third_Highest_Cost_Of_Book_Price
+ FROM book_details
+ WHERE Book_Price < (SELECT MAX(Book_Price) AS Second_Highest_Cost_of_The_Book
+ FROM book_details
+ WHERE Book_Price < 
+ (SELECT MAX(Book_Price)
+ FROM book_details));
+
+ -- to get details of the third hishest cost of the book_price from book_details table
+
+SELECT *
+FROM book_details
+WHERE Book_Price = 
+(SELECT MAX(Book_price) AS Third_Highest_Cost_Of_Book_Price
+ FROM book_details
+ WHERE Book_Price < (SELECT MAX(Book_Price) AS Second_Highest_Cost_of_The_Book
+ FROM book_details
+ WHERE Book_Price < 
+ (SELECT MAX(Book_Price)
+ FROM book_details)));
+ 
+ -- get the details of the book which has a highest cost and second highest cost
+ 
+SELECT *
+FROM book_details
+WHERE Book_Price 
+ IN((SELECT MAX(Book_Price) AS Second_Highest_Cost_of_The_Book
+ FROM book_details
+ WHERE Book_Price < 
+ (SELECT MAX(Book_Price)
+ FROM book_details)),( 
+ (SELECT MAX(Book_Price)
+ FROM book_details)));
+ 
+ SELECT * 
+ FROM book_details
+ WHERE Book_Price IN(2000,1200);
+ 
+ -- GET THE DETAILS OF THE BOOKS SO WHICH HAS COST HIGHER THEN AVERAGE COST
+ 
+ SELECT AVG(Book_Price)
+ FROM book_details;
+ 
+ SELECT *
+ FROM book_details
+ WHERE Book_Price >=
+ (SELECT AVG(Book_Price)
+ FROM book_details);
+ 
+ -- OR
+ 
+ SELECT Book_Price
+ FROM book_details
+ WHERE Book_Price > ( SELECT AVG(Book_Price)
+ FROM book_details);
+ 
+ SELECT * 
+ FROM book_details
+ WHERE Book_Price
+ IN(SELECT Book_Price
+ FROM book_details
+ WHERE Book_Price > ( SELECT AVG(Book_Price)
+ FROM book_details));
+ 
+ -- TO GET THE DETAILS OF THE OOK NAME WHCIH HAS PUSLISH YEAR GRETAER THAN 2005
+ 
+ SELECT Book_Name
+ FROM book_details
+ WHERE Publish_Year > '2005';
+ 
+ SELECT *
+ FROM book_details
+ WHERE Book_Name 
+ IN(SELECT Book_Name
+ FROM book_details
+ WHERE Publish_Year > '2005');
+ 
+ -- OR
+ 
+ SELECT *
+ FROM book_details
+ WHERE Book_Name
+ IN(SELECT Book_Name
+ FROM book_details
+ GROUP BY Publish_Year
+ HAVING Publish_Year >= 2005);
+ 
+ 
+DELETE FROM book_details
+WHERE Book_Name = (SELECT Book_Name
+				FROM Books);
+
+CREATE TABLE Books (
+	Book_id TINYINT,
+    Book_Name VARCHAR(30),
+    Book_Author VARCHAR(30),
+    Book_Price FLOAT,
+    Publish_Year  YEAR,
+    Volume CHAR(5)
+);
+
+SELECT *
+FROM books;
+
+INSERT INTO books
+SELECT *
+FROM book_details
+WHERE Book_id IN(SELECT Book_id
+FROM book_details);
+
+UPDATE book_details
+SET Book_Price = Book_Price + 100
+WHERE Book_Name
+IN(SELECT Book_name
+FROM Books);
+
+DELETE 
+FROM book_details
+WHERE Book_id
+IN(SELECT Book_id 
+FROM books
+WHERE Book_id < 8);
+
+SELECT *
+FROM book_details;
+
+SELECT USER,HOST FROM mysql.user; -- to see the users and host
+
+-- creating a user 
+
+CREATE USER 'TempUser'@'localhost';
+
+SHOW GRANTS FOR 'TempUser'@'localhost';
+
+GRANT SELECT,UPDATE ON book_details TO 'TempUser'@'localhost';
+
+GRANT USAGE ON *.* TO `TempUser`@`localhost`; -- grants all the permission
+
+GRANT ALL ON book_details TO `TempUser`@`localhost`;
+
+REVOKE CREATE,DELETE ON book_details FROM 'TempUser'@'localhost';
 
 
 
