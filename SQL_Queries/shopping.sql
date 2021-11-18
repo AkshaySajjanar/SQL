@@ -78,3 +78,70 @@ ON O.customer_ref = C.customer_id;
 SELECT * 
 FROM customer_details C RIGHT JOIN orders O
 ON O.customer_ref = C.customer_id;
+
+-- FULL JOIN
+
+SELECT * 
+FROM customer_details C LEFT JOIN orders O
+ON O.customer_ref = C.customer_id 
+UNION ALL
+SELECT * 
+FROM customer_details C RIGHT JOIN orders O
+ON O.customer_ref = C.customer_id;
+
+
+CREATE TABLE offers(
+offer_id INT,
+offer_Name VARCHAR(20) NOT NULL,
+offer_Percentage DECIMAL CHECK (offer_Percentage<50),
+offer_ratings INT,
+offer_ref INT,
+PRIMARY KEY(offer_id),
+FOREIGN KEY(offer_ref) REFERENCES orders(order_id)
+);
+
+INSERT INTO offers(offer_id, offer_Name, offer_Percentage, offer_ratings)
+VALUE(1, 'Diwali Offer', 15, 5);
+
+SELECT *
+FROM offers;
+
+-- CROSS JOINING THE OFFERS AND ORDERS
+SELECT *
+FROM orders
+CROSS JOIN offers;
+
+-- VIEW
+
+CREATE VIEW speaker_orders AS
+SELECT *
+FROM orders
+WHERE product_Name
+LIKE 'Sony Speakers';
+
+SELECT *
+FROM speaker_orders;
+
+SELECT *
+FROM speaker_orders
+WHERE order_id = 101;
+
+ALTER VIEW speaker_orders
+AS SELECT *
+FROM orders
+WHERE product_Name = 'Sony Speakers';
+
+CREATE VIEW offers_given
+AS SELECT * 
+FROM orders
+CROSS JOIN offers;
+
+SELECT *
+FROM offers_given;
+
+SELECT *
+FROM offers_given
+WHERE order_Amount > 6000;
+
+-- TO DROP THE VIEW
+DROP VIEW offers_given;
